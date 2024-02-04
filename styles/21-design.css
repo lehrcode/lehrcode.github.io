@@ -1,0 +1,137 @@
+body {
+  background-color: var(--main-bg-color);
+  color: var(--main-fg-color);
+  font-family: 'Source Sans 3', sans-serif;
+  font-variant: slashed-zero;
+  font-size: 1em;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--main-fg-color);
+  text-decoration: underline;
+}
+
+a:hover {
+  color: var(--light-fg-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+h1, .h1 {
+  font-size: 2em;
+}
+
+h2, .h2 {
+  font-size: 1.75em;
+}
+
+h3, .h3 {
+  font-size: 1.5em;
+}
+
+h4, .h4 {
+  font-size: 1.25em;
+}
+
+h5, .h5 {
+  font-size: 1em;
+}
+
+h6, .h6 {
+  font-size: 0.75em;
+}
+
+pre,
+code {
+  font-family: 'Source Code Pro', monospace;
+}
+
+pre {
+  padding: 1em;
+  background-color: var(--code-bg-color);
+}
+
+footer {
+  color: var(--light-fg-color);
+  padding: 1em;
+  margin: 0 auto;
+  max-width: 960px;
+}
+
+footer a, .tags a {
+  color: var(--light-fg-color);
+}
+
+footer a:hover, .tags a:hover {
+  color: var(--main-fg-color);
+}
+
+main {
+  padding: 1em;
+  margin: 0 auto;
+  max-width: 960px;
+}
+
+header {
+  padding: 1em;
+  background-color: var(--inverse-bg-color);
+  color: var(--inverse-fg-color);
+}
+
+header a {
+  color: var(--inverse-fg-color);
+}
+
+header hgroup {
+  margin: 0 auto;
+  max-width: 960px;
+}
+
+header hgroup p {
+  margin: 0 0 1em 0;
+}
+
+header h1 {
+  margin: 0.5em 0 0 0;
+}
+
+header h1 a {
+  text-decoration: none;
+}
+
+header nav {
+  margin: 1em auto;
+  max-width: 960px;
+}
+
+img {
+  max-width: 100%;
+}
+
+ul.index {
+  padding: 0;
+}
+
+ul.index li {
+  list-style: none;
+  color: var(--light-fg-color);
+}
+
+.date {
+  color: var(--light-fg-color);
+  margin-top: 1em;
+}
+
+.tags {
+  color: var(--light-fg-color);
+  margin-top: 2em;
+}

@@ -1,0 +1,31 @@
+@font-face {
+  font-family: 'Source Code Pro';
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  src: url('../fonts/SourceCodePro-Regular.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  font-weight: 400;
+  font-style: italic;
+  font-stretch: normal;
+  src: url('../fonts/SourceCodePro-It.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  font-weight: 700;
+  font-style: normal;
+  font-stretch: normal;
+  src: url('../fonts/SourceCodePro-Bold.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  font-weight: 700;
+  font-style: italic;
+  font-stretch: normal;
+  src: url('../fonts/SourceCodePro-BoldIt.woff') format('woff')
+}

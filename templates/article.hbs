@@ -1,0 +1,10 @@
+{{#> layout }}
+<div class="date"><time datetime="{{isoDate published}}">{{fullDate published}}</time></div>
+{{{htmlBody}}}
+<div class="tags">
+  Tags:
+{{#each tags}}
+  <a href="/#{{.}}">{{.}}</a>
+{{/each}}
+</div>
+{{/layout}}

@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "commonmark": "npm:commonmark@0.31.0",
+    "handlebars": "npm:handlebars@4.7.8",
+    "@types/csso": "npm:@types/csso@5.0.0",
+    "csso": "npm:csso@5.0.5",
+    "highlightjs": "npm:highlight.js@11.9.0"
+  },
+  "tasks": {
+    "publish": "deno run --allow-read --allow-write scripts/publish.ts"
+  }
+}

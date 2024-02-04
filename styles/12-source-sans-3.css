@@ -1,0 +1,31 @@
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  src: url('../fonts/SourceSans3-Regular.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 400;
+  font-style: italic;
+  font-stretch: normal;
+  src: url('../fonts/SourceSans3-It.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 700;
+  font-style: normal;
+  font-stretch: normal;
+  src: url('../fonts/SourceSans3-Bold.woff') format('woff')
+}
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 700;
+  font-style: italic;
+  font-stretch: normal;
+  src: url('../fonts/SourceSans3-BoldIt.woff') format('woff')
+}
