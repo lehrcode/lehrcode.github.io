@@ -8,12 +8,12 @@ body {
 }
 
 a {
-  color: var(--main-fg-color);
+  color: var(--link-color);
   text-decoration: underline;
 }
 
 a:hover {
-  color: var(--light-fg-color);
+  color: var(--link-hover-color);
 }
 
 h1,
@@ -58,6 +58,7 @@ code {
 pre {
   padding: 1em;
   background-color: var(--code-bg-color);
+  overflow-x: auto;
 }
 
 footer {
@@ -72,7 +73,7 @@ footer a, .tags a {
 }
 
 footer a:hover, .tags a:hover {
-  color: var(--main-fg-color);
+  color: var(--link-hover-color);
 }
 
 main {
@@ -83,12 +84,8 @@ main {
 
 header {
   padding: 1em;
-  background-color: var(--inverse-bg-color);
-  color: var(--inverse-fg-color);
-}
-
-header a {
-  color: var(--inverse-fg-color);
+  background-color: var(--header-bg-color);
+  color: var(--header-fg-color);
 }
 
 header hgroup {
@@ -104,7 +101,8 @@ header h1 {
   margin: 0.5em 0 0 0;
 }
 
-header h1 a {
+header h1 a, header h1 a:hover {
+  color: var(--header-fg-color);
   text-decoration: none;
 }
 

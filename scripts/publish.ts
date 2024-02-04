@@ -3,6 +3,8 @@ import Handlebars from 'handlebars';
 import { minify } from 'csso';
 import { CustomHtmlRenderer } from './custom-html-renderer.ts';
 import { Article } from "./article.ts";
+// @deno-types="./commonmark.d.ts"
+import { Node } from 'commonmark';
 const { mkdir, readDir, readTextFile, writeTextFile, copyFile } = Deno;
 
 function mapTags(tag: string): string[] {
@@ -26,25 +28,29 @@ function mapTags(tag: string): string[] {
   }
 }
 
+const renderer = new CustomHtmlRenderer();
+
 Handlebars.registerHelper('fullDate', (date: Date) => date.toLocaleDateString('de-DE', { dateStyle: 'full' }));
 Handlebars.registerHelper('isoDate', (date: Date) => date.toISOString().split('T')[0]);
 Handlebars.registerHelper('rssDate', (date: Date) => date.toUTCString());
 Handlebars.registerHelper('shortDate', (date: Date) => date.toLocaleDateString('de-DE', { dateStyle: 'medium' }));
+Handlebars.registerHelper('md', (node: Node) => renderer.render(node));
+Handlebars.registerHelper('join', (strings: string[]) => strings.join(', '));
 Handlebars.registerPartial('layout', Handlebars.compile(await readTextFile('templates/_layout.hbs')))
 
+const templateOptions = {allowProtoPropertiesByDefault: true, allowProtoMethodsByDefault: true};
 const articleTemplate = Handlebars.compile(await readTextFile('templates/article.hbs'));
 const indexTemplate = Handlebars.compile(await readTextFile('templates/index.hbs'));
 
-const renderer = new CustomHtmlRenderer();
+
 const tutorials: Article[] = await Article.parseDir('tutorials', mapTags);
 const tags: string[] = [...new Set(tutorials.flatMap(a => a.tags))].sort();
 
 for (const a of tutorials) {
   const targetDir = `public/${a.name}`;
   await mkdir(targetDir, { recursive: true, mode: 0o755 });
-  const htmlBody = renderer.render(a.body);
   console.log(`${targetDir}/index.html`);
-  await writeTextFile(`${targetDir}/index.html`, articleTemplate({htmlBody, ...a}));
+  await writeTextFile(`${targetDir}/index.html`, articleTemplate(a, templateOptions));
   for (const img of a.imageFilenames) {
     if (img.indexOf('/') > -1) {
       const path = img.substring(0, img.lastIndexOf('/'));
@@ -105,4 +111,4 @@ for (const tag of tags) {
   tutorialsByTag.push({tag, tutorials: tutorials.filter(a => a.tags.includes(tag))});
 }
 console.log('public/index.html');
-await writeTextFile('public/index.html', indexTemplate({tutorials, tutorialsByTag}, {allowProtoPropertiesByDefault: true}));
+await writeTextFile('public/index.html', indexTemplate({tutorials, tutorialsByTag}, templateOptions));

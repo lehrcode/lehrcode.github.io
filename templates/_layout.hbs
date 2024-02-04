@@ -2,6 +2,9 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+{{#if tags}}
+  <meta name="keywords" content="{{join tags}}">
+{{/if}}
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -12,7 +15,7 @@
 <header>
   <hgroup>
     <h1><a href="/">Lehrcode.de</a></h1>
-    <p>Webdesign und Softwareentwicklung lernen</p>
+    <p>Softwareentwicklung und Webdesign lernen</p>
   </hgroup>
 </header>
 <main>

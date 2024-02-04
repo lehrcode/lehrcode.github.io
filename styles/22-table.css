@@ -1,0 +1,24 @@
+.table-wrapper {
+  padding: 1em;
+  background-color: var(--code-bg-color);
+  overflow-x: auto;
+}
+
+.table-centered {
+  margin: 0 auto;
+}
+
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  border: 1px solid var(--main-fg-color);
+}
+
+th, td {
+  padding: 0.5em;
+  border: 1px solid var(--main-fg-color);
+  background-color: var(--main-bg-color);
+  color: var(--main-fg-color);
+  font-family: 'Source Code Pro', monospace;
+}
+
