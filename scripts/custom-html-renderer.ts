@@ -21,13 +21,12 @@ export class CustomHtmlRenderer extends HtmlRenderer {
       attrs.push(["class", cls]);
     }
     this.cr();
-    switch (lang?.toLowerCase()) {
-      case 'csv': {
-        const values = parseCsv(node.literal ?? '');
-        this.csv_table(values, infoWords?.[1]);
-        break;
-      }
-      default: {
+    if (lang) {
+      if (lang?.toLowerCase() === 'mermaid') {
+        this.tag("pre", [["class", "mermaid"]]);
+        this.out(node.literal ?? '');
+        this.tag("/pre");
+      } else {
         this.tag("pre");
         this.tag("code", attrs);
         if (infoWords.length > 0 && infoWords[0].length > 0) {
@@ -38,6 +37,16 @@ export class CustomHtmlRenderer extends HtmlRenderer {
         this.tag("/code");
         this.tag("/pre");
       }
+    } else {
+      this.tag("pre");
+      this.tag("code", attrs);
+      if (infoWords.length > 0 && infoWords[0].length > 0) {
+        this.lit(hljs.highlight(node.literal ?? '', { language: infoWords[0] }).value)
+      } else {
+        this.text(node);
+      }
+      this.tag("/code");
+      this.tag("/pre");
     }
     this.cr();
   }

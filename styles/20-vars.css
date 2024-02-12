@@ -9,7 +9,7 @@
   --code-bg-color: #e2e7ee;
 }
 
-@media (prefers-color-scheme: dark) {
+@media screen and (prefers-color-scheme: dark) {
   :root {
     --link-color: #96d0ff;
     --link-hover-color: #f47067;

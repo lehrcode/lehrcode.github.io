@@ -7,4 +7,14 @@
   <a href="/#{{.}}">{{.}}</a>
 {{/each}}
 </div>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'neutral',
+    themeVariables: {
+      fontFamily: "'Source Sans 3', sans-serif"
+    }
+  });
+</script>
 {{/layout}}
