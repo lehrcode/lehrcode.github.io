@@ -1,7 +1,6 @@
 // @deno-types="./commonmark.d.ts"
 import { HtmlRenderer, HtmlRenderingOptions, Node } from "commonmark";
 import hljs from "highlightjs";
-import { parse as parseCsv } from "csv";
 
 export class CustomHtmlRenderer extends HtmlRenderer {
   constructor(options?: HtmlRenderingOptions) {
@@ -49,41 +48,5 @@ export class CustomHtmlRenderer extends HtmlRenderer {
       this.tag("/pre");
     }
     this.cr();
-  }
-
-  private csv_table(values: string[][], cls?: string): void {
-    const cols = values.reduce((c, row) => Math.max(c, row.length), 0);
-    let first = true;
-    this.tag("div", [["class", "table-wrapper"]]);
-    if (cls) {
-      this.tag("table", [["class", this.esc(cls)]]);
-    } else {
-      this.tag("table");
-    }
-    for (const row of values) {
-      if (row.length === 0) {
-        continue;
-      }
-      this.tag("tr");
-      let cellTag = 'td';
-      if (first === true) {
-        cellTag = 'th';
-        first = false;
-      }
-      if (row.length === 1) {
-        this.tag(cellTag, [['colspan', `${cols}`]]);
-        this.out(row[0]);
-        this.tag(`/${cellTag}`);
-      } else {
-        for (const cell of row) {
-          this.tag(cellTag);
-          this.out(cell);
-          this.tag(`/${cellTag}`);
-        }
-      }
-      this.tag("/tr");
-    }
-    this.tag("/table");
-    this.tag("/div");
   }
 }

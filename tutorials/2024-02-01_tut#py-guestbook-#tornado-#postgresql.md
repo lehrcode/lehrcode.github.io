@@ -30,12 +30,12 @@ CREATE SCHEMA AUTHORIZATION guestbook;
 Mit dem neu angelegten Datenbankbenutzer können wir jetzt in das ebenfalls neu angelegte Schema die Tabelle erstellen.
 
 ```postgresql
-create table guestbook (
-    id bigint generated always as identity (start with 1 increment by 1) primary key,
-    guestname varchar not null,
-    email varchar not null,
-    message varchar not null,
-    posted timestamp(3) default current_timestamp not null
+CREATE TABLE "entry" (
+    "id" BIGINT GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY,
+    "name" VARCHAR NOT NULL,
+    "email" VARCHAR NOT NULL,
+    "message" VARCHAR NOT NULL,
+    "posted" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 ```
 
@@ -129,16 +129,29 @@ gekapselt werden.
 classDiagram
 
 `tornado.web.RequestHandler` <|-- GuestbookHandler
-GuestbookHandler --> GuestbookRepository
+GuestbookHandler --> EntryRepository
+EntryRepository ..> Entry
 
 class `tornado.web.RequestHandler`
 
-class GuestbookRepository {
+class Entry {
+  id: int
+  name: str
+  email: str
+  message: str
+  posted: datetime
+}
+
+class EntryRepository {
   __pool: asyncpg.Pool
+  __from_record(rec: asyncpg.Record) Entry
+  add_entry(name: str, email: str, message: str)
+  count_entries() int
+  get_entries(page: int) list[Entry]
 }
 
 class GuestbookHandler {
-  __repo: GuestbookRepository
+  __repo: EntryRepository
   get()
   post()
 }
@@ -146,72 +159,92 @@ class GuestbookHandler {
 ```
 
 ```python
+from datetime import datetime
+from http import HTTPStatus
+
 import asyncpg
 from tornado.web import RequestHandler, HTTPError
 
 MAX_ENTRIES_PER_PAGE = 5
 
 
-class GuestbookRepository:
+class Entry:
+    def __init__(self, id: int, name: str, email: str, message: str, posted: datetime):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.message = message
+        self.posted = posted
 
+
+class EntryRepository:
     def __init__(self, pool: asyncpg.Pool):
         self.__pool = pool
 
-    async def add_entry(self, guestname: str, email: str, message: str):
-        await self.__pool.execute(
-            "insert into guestbook (guestname, email, message) values ($1, $2, $3)",
-            guestname, email, message)
+    def __from_record(self, rec: asyncpg.Record) -> Entry:
+        return Entry(rec['id'], rec['name'], rec['email'], rec['message'], rec['posted'])
+
+    async def add_entry(self, name: str, email: str, message: str):
+        await self.__pool.execute("""
+                                  INSERT INTO "entry" ("name", "email", "message")
+                                  VALUES ($1, $2, $3)
+                                  """,
+                                  name, email, message)
 
     async def count_entries(self) -> int:
-        return (await self.__pool.fetchrow('select count(*) as total_entries from guestbook'))['total_entries']
+        return (await self.__pool.fetchrow('SELECT count(*) AS total_entries FROM "entry"'))['total_entries']
 
-    async def get_entries(self, page: int) -> list[asyncpg.Record]:
-        return await self.__pool.fetch(
-            "SELECT guestname,message,posted FROM guestbook ORDER BY posted DESC LIMIT $1 OFFSET $2",
-            MAX_ENTRIES_PER_PAGE, (page - 1) * MAX_ENTRIES_PER_PAGE)
+    async def get_entries(self, page: int) -> list[Entry]:
+        entries = await self.__pool.fetch("""
+                                          SELECT "id", "name", "email", "message", "posted"
+                                          FROM "entry"
+                                          ORDER BY posted DESC
+                                          LIMIT $1 OFFSET $2
+                                          """,
+                                          MAX_ENTRIES_PER_PAGE, (page - 1) * MAX_ENTRIES_PER_PAGE)
+        return [self.__from_record(x) for x in entries]
 
 
 class GuestbookHandler(RequestHandler):
-
-    def initialize(self, repo: GuestbookRepository):
+    def initialize(self, repo: EntryRepository):
         self.__repo = repo
 
     async def post(self):
-        guestname = self.get_body_argument('guestname')
+        name = self.get_body_argument('name')
         email = self.get_body_argument('email')
         message = self.get_body_argument('message')
-        await self.__repo.add_entry(guestname, email, message)
+        await self.__repo.add_entry(name, email, message)
         self.redirect('/guestbook')
 
     async def get(self):
         page = int(self.get_query_argument('page', '1'))
         if page < 1:
-            raise HTTPError(400, 'invalid page')
+            raise HTTPError(HTTPStatus.BAD_REQUEST, 'invalid page argument')
         total_entries = await self.__repo.count_entries()
         entries = await self.__repo.get_entries(page)
-        await self.render('template.html',
+        await self.render('guestbook.html',
                           entries=entries,
                           page=page,
                           total_entries=total_entries,
-                          MAX_ENTRIES_PER_PAGE=MAX_ENTRIES_PER_PAGE
-                          )
+                          MAX_ENTRIES_PER_PAGE=MAX_ENTRIES_PER_PAGE)
+
 ```
 
 Zur Darstellung der Gästebuchseiten und des Formulars nutzen wir ein Template.
 
-```django
+```html
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Guestbook</title>
-    <link href="/static/style.css" rel="stylesheet">
+    <link href="{{ static_url('style.css') }}" rel="stylesheet">
 </head>
 <body>
 <div class="container">
     <h1>Guestbook</h1>
     <form method="post">
-        <label for="gm">Name:</label><input type="text" name="guestname" id="gm" required>
+        <label for="nm">Name:</label><input type="text" name="name" id="nm" required>
         <label for="eml">eMail:</label><input type="email" name="email" id="eml" required>
         <label for="msg">Message:</label><textarea name="message" id="msg" rows="5" required></textarea>
         <button type="submit">Post</button>
@@ -219,10 +252,10 @@ Zur Darstellung der Gästebuchseiten und des Formulars nutzen wir ein Template.
     {% for entry in entries %}
     <div class="entry">
         <div>
-            {{ entry["guestname"] }}<br>
-            <small>{{ entry["posted"].strftime("%Y-%m-%d %H:%M") }}</small>
+            <a href="mailto:{{ entry.email }}">{{ entry.name }}</a><br>
+            <small>{{ entry.posted.strftime('%Y-%m-%d %H:%M') }}</small>
         </div>
-        <div class="message">{{ entry["message"] }}</div>
+        <div class="message">{{ entry.message }}</div>
     </div>
     {% end %}
     {% import math %}

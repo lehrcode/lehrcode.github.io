@@ -11,16 +11,15 @@ function mapTags(tag: string): string[] {
   switch(tag.toLowerCase()) {
     case 'go':
       return ['golang'];
-    case 'gopg':
-      return ['golang', 'postgresql'];
     case 'js':
       return ['javascript'];
     case 'pg':
+    case 'postgres':
       return ['postgresql'];
-    case 'pgpy':
-      return ['postgresql', 'python'];
     case 'py':
       return ['python'];
+    case 'tornado':
+      return ['python', 'tornado'];
     case 'ts':
       return ['typescript'];
     default:
@@ -35,8 +34,18 @@ Handlebars.registerHelper('isoDate', (date: Date) => date.toISOString().split('T
 Handlebars.registerHelper('rssDate', (date: Date) => date.toUTCString());
 Handlebars.registerHelper('shortDate', (date: Date) => date.toLocaleDateString('de-DE', { dateStyle: 'medium' }));
 Handlebars.registerHelper('md', (node: Node) => renderer.render(node));
+Handlebars.registerHelper('usesMermaid', (node: Node) => {
+  const walker = node.walker();
+  let event;
+  while ((event = walker.next())) {
+    if (event.entering === true && event.node.type === 'code_block' && event.node.info?.includes('mermaid')) {
+      return true;
+    }
+  }
+  return false;
+});
 Handlebars.registerHelper('join', (strings: string[]) => strings.join(', '));
-Handlebars.registerPartial('layout', Handlebars.compile(await readTextFile('templates/_layout.hbs')))
+Handlebars.registerPartial('layout', Handlebars.compile(await readTextFile('templates/_layout.hbs')));
 
 const templateOptions = {allowProtoPropertiesByDefault: true, allowProtoMethodsByDefault: true};
 const articleTemplate = Handlebars.compile(await readTextFile('templates/article.hbs'));

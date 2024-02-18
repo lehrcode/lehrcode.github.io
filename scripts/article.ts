@@ -23,12 +23,22 @@ export class Article {
 
   }
 
+  private static extractTags(rawname: string): string[] {
+    const re = /#([0-9a-zA-Z]+)/g;
+    const tags = [];
+    for (const match of rawname.matchAll(re) ?? []) {
+      tags.push(match?.[1]);
+    }
+    return [rawname.replaceAll('#', ''), ...tags];
+  }
+
   static async parseDir(dir: string, mapTags?: (e: string) => string[]): Promise<Article[]> {
     const parser = new Parser();
     const articles: Article[] = [];
     for await (const f of readDir(dir)) {
       if (f.isFile === true && f.name.endsWith('.md') === true) {
-        const [published, name, ...tags] = f.name.substring(0, f.name.length - 3).split('_');
+        const [published, rawname] = f.name.substring(0, f.name.length - 3).split('_', 2);
+        const [name, ...tags] = this.extractTags(rawname);
         if (published && name) {
           const ptime = new Date(published);
           const text = await readTextFile(`${dir}/${f.name}`);
@@ -38,7 +48,7 @@ export class Article {
                                       body,
                                       ptime,
                                       mtime ?? ptime,
-                                      mapTags ? tags.flatMap(mapTags) : tags);
+                                      [...new Set(mapTags ? tags.flatMap(mapTags) : tags)].sort());
           console.log({ name: article.name, title: article.title, tags: article.tags });
           articles.push(article);
         }
